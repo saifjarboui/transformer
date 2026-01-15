@@ -5,6 +5,8 @@
 """
 import math
 import time
+import os
+import glob
 
 from torch import nn, optim
 from torch.optim import Adam
@@ -49,6 +51,21 @@ scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
                                                  patience=patience)
 
 criterion = nn.CrossEntropyLoss(ignore_index=src_pad_idx)
+
+
+def load_checkpoint(model, save_path='saved'):
+    last_model = sorted(glob.glob(f'{save_path}/model-*.pt'))
+    if last_model:
+        latest = last_model[-1]
+        print(f'Loading checkpoint: {latest}')
+        model.load_state_dict(torch.load(latest))
+        # Extract loss from filename "model-0.123.pt"
+        try:
+            best_loss = float(latest.split('-')[-1].replace('.pt', ''))
+        except ValueError:
+            best_loss = float('inf')
+        return best_loss
+    return float('inf')
 
 
 def train(model, iterator, optimizer, criterion, clip):
@@ -108,6 +125,11 @@ def evaluate(model, iterator, criterion):
 
 
 def run(total_epoch, best_loss):
+    if not os.path.exists('saved'):
+        os.makedirs('saved')
+    if not os.path.exists('result'):
+        os.makedirs('result')
+
     train_losses, test_losses, bleus = [], [], []
     for step in range(total_epoch):
         start_time = time.time()
@@ -120,7 +142,7 @@ def run(total_epoch, best_loss):
 
         train_losses.append(train_loss)
         test_losses.append(valid_loss)
-        bleus.append( )
+        bleus.append(bleu)
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
         if valid_loss < best_loss:
@@ -146,4 +168,5 @@ def run(total_epoch, best_loss):
 
 
 if __name__ == '__main__':
-    run(total_epoch=epoch, best_loss=inf)
+    best_loss = load_checkpoint(model)
+    run(total_epoch=epoch, best_loss=best_loss)
