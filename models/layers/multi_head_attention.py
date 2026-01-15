@@ -4,7 +4,7 @@
 @homepage : https://github.com/gusdnd852
 """
 from torch import nn
-
+import torch
 from models.layers.scale_dot_product_attention import ScaleDotProductAttention
 
 
@@ -38,7 +38,7 @@ class MultiHeadAttention(nn.Module):
 
         return out
 
-    def split(self, tensor):
+    def split(self, tensor : torch.Tensor):
         """
         split tensor by number of head
 

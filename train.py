@@ -45,7 +45,6 @@ optimizer = Adam(params=model.parameters(),
                  eps=adam_eps)
 
 scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
-                                                 verbose=True,
                                                  factor=factor,
                                                  patience=patience)
 
@@ -121,7 +120,7 @@ def run(total_epoch, best_loss):
 
         train_losses.append(train_loss)
         test_losses.append(valid_loss)
-        bleus.append(bleu)
+        bleus.append( )
         epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
         if valid_loss < best_loss:

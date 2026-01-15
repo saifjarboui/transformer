@@ -6,8 +6,12 @@
 import torch
 
 # GPU device setting
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+elif torch.backends.mps.is_available():
+    device = torch.device("mps")
+else:
+    device = torch.device("cpu")
 # model parameter setting
 batch_size = 128
 max_len = 256
@@ -23,7 +27,7 @@ factor = 0.9
 adam_eps = 5e-9
 patience = 10
 warmup = 100
-epoch = 1000
+epoch = 2
 clip = 1.0
 weight_decay = 5e-4
 inf = float('inf')
