@@ -90,7 +90,6 @@ def train(model, iterator, optimizer, criterion, clip):
 
     return epoch_loss / len(iterator)
 
-
 def evaluate(model, iterator, criterion):
     model.eval()
     epoch_loss = 0
@@ -111,8 +110,12 @@ def evaluate(model, iterator, criterion):
                 try:
                     trg_words = idx_to_word(batch.trg[j], loader.target.vocab)
                     output_words = output[j].max(dim=1)[1]
-                    output_words = idx_to_word(output_words, loader.target.vocab)
-                    bleu = get_bleu(hypotheses=output_words.split(), reference=trg_words.split())
+                    output_words = idx_to_word(output_words,
+                                               loader.target.vocab)
+
+                    # Wrap words in a list so get_bleu sees them as a single sentence pair
+                    bleu = get_bleu(hypotheses=[output_words.split()],
+                                    reference=[trg_words.split()])
                     total_bleu.append(bleu)
                 except:
                     pass
